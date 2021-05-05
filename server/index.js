@@ -9,10 +9,12 @@ const requestlib = require('request');
 const RasaClient = require("./rasa-api");
 const SpeechKeyHelper = require("./speech-key-helper")
 const SpeechSynthesis = require("./speech-synthesis");
-const BodyParser = require('body-parser');
+
+const cors = require('cors')
 
 const app = express();
-app.use(BodyParser.json());
+app.use(cors())
+app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(pino);
 
@@ -96,7 +98,7 @@ app.post('/api/request-answer', async (req, res, next) => {
 
 
 app.post('/api/start-speech-synthesis', async (req, res, next) => {
-    console.log(req.body);
+    console.log(req.body.text);
     if (req.body.length === 0) {
         res.sendStatus(300);
         res.send("no data");
@@ -104,7 +106,7 @@ app.post('/api/start-speech-synthesis', async (req, res, next) => {
 
     // var speech_client = new SpeechClient('http://localhost:3003');
     try {
-        const answer_speech = await SpeechSynthesis(req.body);
+        const answer_speech = await SpeechSynthesis(req.body.text);
         res.send("ok");
     } catch (error) {
         res.sendStatus(500);
@@ -112,10 +114,10 @@ app.post('/api/start-speech-synthesis', async (req, res, next) => {
     }
 });
 
-app.post('/post-test', (req, res) => {
-    console.log('Got body:', req.body);
-    res.sendStatus(200);
-});
+// app.post('/post-test', (req, res) => {
+//     console.log('Got body:', req.body);
+//     res.sendStatus(200);
+// });
 
 app.listen(3001, () =>
     console.log('Express server is running on localhost:3001')

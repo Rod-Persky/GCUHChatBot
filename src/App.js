@@ -1,13 +1,12 @@
 import { getSTTTokenOrRefresh, getChatTokenOrRefresh } from "./token_util";
-import React, { Component } from 'react';
+import React, { Component } from "react";
 import RasaClient from "./rasa-api";
 import SpeechClient from "./speech-api";
-import { Container } from 'reactstrap';
-import './custom.css'
-import { ResultReason } from 'microsoft-cognitiveservices-speech-sdk';
+import { Container } from "reactstrap";
+import "./custom.css";
+import { ResultReason } from "microsoft-cognitiveservices-speech-sdk";
 
-
-const speechsdk = require('microsoft-cognitiveservices-speech-sdk');
+const speechsdk = require("microsoft-cognitiveservices-speech-sdk");
 
 export default class extends React.Component {
   constructor(props) {
@@ -18,10 +17,11 @@ export default class extends React.Component {
     };
   }
 
-  async componentDidMount() { 
+  async componentDidMount() {
     await this.setupTTS();
     await this.setupSTT();
     await this.setupRasaConnection();
+    await this.setupSpeechConnection();
   }
 
   async setupTTS() {
@@ -37,7 +37,7 @@ export default class extends React.Component {
   }
 
   async setupSpeechConnection() {
-    this.speechClient = new SpeechClient("http://localhost:3005");
+    this.speechClient = new SpeechClient("http://localhost:3001");
   }
 
   async requestAnswerRasa(text) {
@@ -50,8 +50,11 @@ export default class extends React.Component {
     return reply_chat_messages[0].text;
   }
 
-  async sendSpeechRequest(text) {
-
+  sendSpeechRequest(text) {
+    let speechValue = this.speechClient.speaking(text);
+    if (speechValue.length === 0) {
+      throw "No data for speech synthesis";
+    }
   }
 
   async sttFromMic() {
@@ -72,23 +75,20 @@ export default class extends React.Component {
       displayText: "speak into your microphone...",
     });
 
-
     recognizer.recognizeOnceAsync((result) => {
       let displayText;
       if (result.reason === ResultReason.RecognizedSpeech) {
-        this.requestAnswerRasa(result.text).then(answer => {
+        this.requestAnswerRasa(result.text).then((answer) => {
           // var answer_compiled = "";
           // for (let msg_idx = 0; msg_idx < answer.length; msg_idx++) {
           //   answer_compiled = `${answer_compiled}\nBot: ${answer[msg_idx]}`
           // }
+          this.sendSpeechRequest(answer);
           this.setState({
             displayText: `Me: ${result.text}\nBot: ${answer}`,
           });
-          this.sendSpeechRequest(answer);
         });
-
         displayText = `RECOGNIZED: Text=${result.text}`;
-
       } else {
         displayText =
           "ERROR: Speech was cancelled or could not be recognized. Ensure your microphone is working properly.";
@@ -99,12 +99,6 @@ export default class extends React.Component {
       });
     });
   }
-
-  async SendSpeech(displayText) {
-    let reply_speech_messages = await this.speechClient(displayText);
-    if (reply_speech_messages.length === 0) {
-      throw "No data for audio file";
-    }};
 
   render() {
     return (

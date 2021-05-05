@@ -12,6 +12,7 @@
     "botframework-directlinejs": "^0.14.1",
     "botframework-webchat": "^4.13.0",
     "botframework-webchat-component": "^4.13.0",
+    "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "got": "^9.6.0",
     "microsoft-cognitiveservices-speech-sdk": "^1.14.1",

@@ -1,6 +1,5 @@
 "use strict";
 
-const got = require("got");
 const fetch = require('node-fetch');
 
 class RasaClient {
