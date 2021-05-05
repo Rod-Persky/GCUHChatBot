@@ -9,8 +9,10 @@ const requestlib = require('request');
 const RasaClient = require("./rasa-api");
 const SpeechKeyHelper = require("./speech-key-helper")
 const SpeechSynthesis = require("./speech-synthesis");
+const BodyParser = require('body-parser');
 
 const app = express();
+app.use(BodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(pino);
 
