@@ -1,10 +1,14 @@
 require('dotenv').config();
+
 const express = require('express');
 const axios = require('axios');
 const bodyParser = require('body-parser');
-const { request } = require('express');
 const pino = require('express-pino-logger')();
+const { request } = require('express');
 const requestlib = require('request');
+const RasaClient = require("./rasa-api");
+const SpeechKeyHelper = require("./speech-key-helper")
+const SpeechSynthesis = require("./speech-synthesis");
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -12,26 +16,32 @@ app.use(pino);
 
 app.get('/api/get-speech-token', async (req, res, next) => {
     res.setHeader('Content-Type', 'application/json');
-    const speechKey = process.env.SPEECH_KEY;
-    const speechRegion = process.env.SPEECH_REGION;
-
-    if (speechKey === 'paste-your-speech-key-here' || speechRegion === 'paste-your-speech-region-here') {
-        res.status(400).send('You forgot to add your speech key or region to the .env file.');
-    } else {
-        const headers = { 
-            headers: {
-                'Ocp-Apim-Subscription-Key': speechKey,
-                'Content-Type': 'application/x-www-form-urlencoded'
-            }
-        };
-
-        try {
-            const tokenResponse = await axios.post(`https://${speechRegion}.api.cognitive.microsoft.com/sts/v1.0/issueToken`, null, headers);
-            res.send({ token: tokenResponse.data, region: speechRegion });
-        } catch (err) {
-            res.status(401).send('There was an error authorizing your speech key.');
-        }
+    try {
+        res.send(await SpeechKeyHelper());
+    } catch (error) {
+        res.status(401).send('There was an error authorizing your speech key.');
     }
+    
+    // const speechKey = process.env.SPEECH_KEY;
+    // const speechRegion = process.env.SPEECH_REGION;
+
+    // if (speechKey === 'paste-your-speech-key-here' || speechRegion === 'paste-your-speech-region-here') {
+    //     res.status(400).send('You forgot to add your speech key or region to the .env file.');
+    // } else {
+    //     const headers = { 
+    //         headers: {
+    //             'Ocp-Apim-Subscription-Key': speechKey,
+    //             'Content-Type': 'application/x-www-form-urlencoded'
+    //         }
+    //     };
+
+    //     try {
+    //         const tokenResponse = await axios.post(`https://${speechRegion}.api.cognitive.microsoft.com/sts/v1.0/issueToken`, null, headers);
+    //         res.send({ token: tokenResponse.data, region: speechRegion });
+    //     } catch (err) {
+    //         res.status(401).send('There was an error authorizing your speech key.');
+    //     }
+    // }
 });
 
 app.get('/api/get-chat-token', async (req, res, next) => {
@@ -66,6 +76,43 @@ app.get('/api/get-chat-token', async (req, res, next) => {
         res.status(401).send('There was an error authorizing your chat key.');
     }
     
+});
+
+app.post('/api/request-answer', async (req, res, next) => {
+    console.log(req.body);
+    var rasa_client = new RasaClient('http://localhost:5001');
+    try {
+        const answer_rasa = await rasa_client.parse(req.body);
+    } catch (error) {
+        res.sendStatus(500);
+        res.send("whoops");
+    }
+    
+    console.log(answer_rasa);
+});
+
+
+
+app.post('/api/start-speech-synthesis', async (req, res, next) => {
+    console.log(req.body);
+    if (req.body.length === 0) {
+        res.sendStatus(300);
+        res.send("no data");
+    }
+
+    // var speech_client = new SpeechClient('http://localhost:3003');
+    try {
+        const answer_speech = await SpeechSynthesis(req.body);
+        res.send("ok");
+    } catch (error) {
+        res.sendStatus(500);
+        res.send("could not synthesise");
+    }
+});
+
+app.post('/post-test', (req, res) => {
+    console.log('Got body:', req.body);
+    res.sendStatus(200);
 });
 
 app.listen(3001, () =>
