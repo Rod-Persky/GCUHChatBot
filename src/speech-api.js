@@ -26,7 +26,7 @@ class SpeechClient {
 
   speaking(text) {
     return this._post('/api/start-speech-synthesis', {
-      text: text,
+      text,
     });
   }
 }
