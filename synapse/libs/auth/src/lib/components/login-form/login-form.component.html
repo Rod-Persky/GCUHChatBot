@@ -1,0 +1,35 @@
+<div class="synapse-login-form login wp-core-ui">
+
+
+    <div id="login">
+        <h1>Patient Portal</h1>
+
+        <form name="loginform" id="loginform">
+            <p>
+                <label for="user_login">Username or Email Address</label>
+                <input #username type="text" name="log" class="input" value="" size="20" autocapitalize="off" />
+            </p>
+
+            <div class="user-pass-wrap">
+                <label for="user_pass">Password</label>
+                <div class="wp-pwd">
+                    <input #password type="password" name="pwd" class="input password-input" value="" size="20" />
+                    <button type="button" class="button button-secondary wp-hide-pw hide-if-no-js" data-toggle="0"
+                        aria-label="Show password">
+                        <span class="dashicons dashicons-visibility" aria-hidden="true"></span>
+                    </button>
+                </div>
+            </div>
+
+            <p class="submit">
+                <input type="submit" name="wp-submit" id="wp-submit" class="button button-primary button-large"
+                    value="Log In" (click)="login({username: username.value, password: password.value})" />
+            </p>
+        </form>
+
+        <p id="nav">
+            <a href="auth/login?action=register">Register</a> | <a href="auth/login?action=lostpassword">Lost your password?</a>
+        </p>
+    </div>
+
+</div>
