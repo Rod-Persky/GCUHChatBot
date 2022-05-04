@@ -37,6 +37,9 @@
       "tags": [],
       "implicitDependencies": ["clientportal"]
     },
+    "dachat": {
+      "tags": []
+    },
     "data-models": {
       "tags": []
     },

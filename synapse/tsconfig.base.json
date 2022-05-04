@@ -16,6 +16,7 @@
     "baseUrl": ".",
     "paths": {
       "@synapse/auth": ["libs/auth/src/index.ts"],
+      "@synapse/dachat": ["libs/dachat/src/index.ts"],
       "@synapse/data-models": ["libs/data-models/src/index.ts"]
     }
   },

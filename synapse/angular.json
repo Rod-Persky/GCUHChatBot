@@ -149,6 +149,31 @@
         }
       }
     },
+    "dachat": {
+      "projectType": "library",
+      "root": "libs/dachat",
+      "sourceRoot": "libs/dachat/src",
+      "prefix": "synapse",
+      "architect": {
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/dachat"],
+          "options": {
+            "jestConfig": "libs/dachat/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "libs/dachat/src/**/*.ts",
+              "libs/dachat/src/**/*.html"
+            ]
+          }
+        }
+      }
+    },
     "data-models": {
       "projectType": "library",
       "root": "libs/data-models",
